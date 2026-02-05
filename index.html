@@ -1,55 +1,258 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 <head>
-    <title>写字楼二次装修看板 - 数据操作版</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写字楼二次装修管理系统</title>
     <style>
-        /* 基础样式 */
+        /* 全局样式 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: 'Microsoft YaHei', Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
         }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            background-color: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
         }
         
-        h1 {
-            color: #1890ff;
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 3px solid #1890ff;
-            padding-bottom: 10px;
-        }
-        
-        /* 操作面板 */
-        .operation-panel {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        /* 头部样式 */
+        header {
+            background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
             color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 30px;
+            padding: 20px 0;
+            border-radius: 8px 8px 0 0;
+            margin-bottom: 20px;
         }
         
-        .btn-group {
+        .header-content {
             display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .current-date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        /* 主内容区 */
+        .main-content {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .content-area {
+            flex: 1;
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* 导航菜单 */
+        .nav-menu {
+            list-style: none;
+        }
+        
+        .nav-item {
+            margin-bottom: 10px;
+        }
+        
+        .nav-link {
+            display: block;
+            padding: 12px 15px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: all 0.3s;
+        }
+        
+        .nav-link:hover {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .nav-link.active {
+            background-color: #1890ff;
+            color: white;
+        }
+        
+        .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* 统计卡片 */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            border-top: 4px solid #1890ff;
+        }
+        
+        .stat-card.warning {
+            border-color: #fa8c16;
+        }
+        
+        .stat-card.danger {
+            border-color: #f5222d;
+        }
+        
+        .stat-card.success {
+            border-color: #52c41a;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 15px;
         }
         
+        .data-table th {
+            background-color: #fafafa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #e8e8e8;
+        }
+        
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        
+        .data-table tr:hover {
+            background-color: #fafafa;
+        }
+        
+        /* 状态标签 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-approval {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .status-construction {
+            background-color: #e6f7ff;
+            color: #1890ff;
+        }
+        
+        .status-delay {
+            background-color: #fff1f0;
+            color: #f5222d;
+        }
+        
+        .status-completed {
+            background-color: #f6ffed;
+            color: #52c41a;
+        }
+        
+        /* 危险作业标签 */
+        .danger-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            margin: 2px;
+            background-color: #fff1f0;
+            color: #f5222d;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #ffa39e;
+        }
+        
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #1890ff;
+            box-shadow: 0 0 0 2px rgba(24,144,255,0.2);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        /* 按钮样式 */
         .btn {
             padding: 10px 20px;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
+            font-size: 14px;
             cursor: pointer;
-            font-weight: bold;
             transition: all 0.3s;
         }
         
@@ -60,8 +263,6 @@
         
         .btn-primary:hover {
             background-color: #096dd9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(24, 144, 255, 0.4);
         }
         
         .btn-success {
@@ -71,203 +272,48 @@
         
         .btn-success:hover {
             background-color: #389e0d;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(82, 196, 26, 0.4);
-        }
-        
-        .btn-warning {
-            background-color: #faad14;
-            color: white;
-        }
-        
-        .btn-warning:hover {
-            background-color: #d48806;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(250, 173, 20, 0.4);
         }
         
         .btn-danger {
-            background-color: #ff4d4f;
+            background-color: #f5222d;
             color: white;
         }
         
         .btn-danger:hover {
             background-color: #cf1322;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 77, 79, 0.4);
         }
         
-        /* 表格样式 */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 30px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .btn-group {
+            display: flex;
+            gap: 8px;
         }
         
-        .data-table th {
+        /* 操作按钮 */
+        .action-btn {
+            padding: 4px 8px;
+            margin: 2px;
+            font-size: 12px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .edit-btn {
             background-color: #1890ff;
             color: white;
-            padding: 12px;
-            text-align: left;
-            font-weight: bold;
-            position: sticky;
-            top: 0;
         }
         
-        .data-table td {
-            padding: 10px;
-            border-bottom: 1px solid #e8e8e8;
+        .delete-btn {
+            background-color: #ff4d4f;
+            color: white;
         }
         
-        .data-table tr:hover {
-            background-color: #f0f7ff;
-        }
-        
-        .data-table tr.selected {
-            background-color: #e6f7ff;
-        }
-        
-        /* 表单样式 */
-        .form-section {
-            background-color: #fafafa;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid #e8e8e8;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid #d9d9d9;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: #1890ff;
-            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
-        }
-        
-        /* 状态标记 */
-        .status-badge {
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            min-width: 80px;
-        }
-        
-        .status-new { background-color: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-        .status-processing { background-color: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
-        .status-delay { background-color: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
-        .status-completed { background-color: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-        .status-warning { background-color: #fff7e6; color: #fa8c16; border: 1px solid #ffd591; }
-        
-        /* 标记操作按钮 */
         .mark-btn {
-            padding: 4px 10px;
-            font-size: 12px;
-            border-radius: 3px;
-            border: 1px solid #ddd;
-            background: white;
-            cursor: pointer;
-            margin-right: 5px;
+            background-color: #fa8c16;
+            color: white;
         }
         
-        .mark-btn:hover {
-            opacity: 0.8;
-        }
-        
-        /* 选项卡 */
-        .tabs {
-            display: flex;
-            border-bottom: 2px solid #e8e8e8;
-            margin-bottom: 20px;
-        }
-        
-        .tab {
-            padding: 12px 24px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
-            font-weight: bold;
-            color: #666;
-        }
-        
-        .tab.active {
-            color: #1890ff;
-            border-bottom-color: #1890ff;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* KPI卡片 */
-        .kpi-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .kpi-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            text-align: center;
-        }
-        
-        .kpi-value {
-            font-size: 32px;
-            font-weight: bold;
-            margin: 10px 0;
-            color: #1890ff;
-        }
-        
-        .kpi-title {
-            color: #666;
-            font-size: 14px;
-        }
-        
-        .kpi-trend {
-            font-size: 12px;
-        }
-        
-        .trend-up { color: #52c41a; }
-        .trend-down { color: #ff4d4f; }
-        
-        /* 预警面板 */
-        .warning-panel {
-            background: linear-gradient(135deg, #fff7e6 0%, #fff1f0 100%);
-            border-left: 4px solid #fa8c16;
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 5px;
-        }
-        
-        /* 模态框 */
+        /* 模态框样式 */
         .modal {
             display: none;
             position: fixed;
@@ -277,17 +323,17 @@
             height: 100%;
             background-color: rgba(0,0,0,0.5);
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
         }
         
         .modal-content {
+            position: relative;
             background: white;
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            border-radius: 8px;
             padding: 30px;
-            border-radius: 10px;
-            min-width: 500px;
-            max-width: 90%;
-            max-height: 90vh;
+            max-height: 80vh;
             overflow-y: auto;
         }
         
@@ -296,14 +342,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #1890ff;
         }
         
         .modal-title {
-            font-size: 20px;
-            font-weight: bold;
-            color: #1890ff;
+            font-size: 18px;
+            font-weight: 600;
         }
         
         .close-btn {
@@ -314,1165 +357,1149 @@
             color: #999;
         }
         
-        .close-btn:hover {
-            color: #ff4d4f;
+        /* 复选框组 */
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* 搜索和筛选 */
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 300px;
+            padding: 10px;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+        }
+        
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* 页面标题 */
+        .page-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <h1>🏢 写字楼二次装修智能看板</h1>
-        
-        <!-- 操作面板 -->
-        <div class="operation-panel">
-            <h3>📋 数据操作中心</h3>
-            <div class="btn-group">
-                <button class="btn btn-primary" onclick="showAddForm()">➕ 新增项目</button>
-                <button class="btn btn-success" onclick="generateSampleData()">🎲 生成示例数据</button>
-                <button class="btn btn-warning" onclick="exportToExcel()">📊 导出Excel</button>
-                <button class="btn btn-danger" onclick="clearAllData()">🗑️ 清空数据</button>
-                <button class="btn btn-primary" onclick="showStatistics()">📈 查看统计</button>
+        <!-- 头部 -->
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-building"></i> 写字楼装修管理系统
+                </div>
+                <div class="current-date" id="currentDate"></div>
             </div>
-        </div>
+        </header>
         
-        <!-- 选项卡 -->
-        <div class="tabs">
-            <div class="tab active" onclick="switchTab('dashboard')">🎯 领导看板</div>
-            <div class="tab" onclick="switchTab('projects')">📋 项目管理</div>
-            <div class="tab" onclick="switchTab('inspection')">🔍 巡检记录</div>
-            <div class="tab" onclick="switchTab('analysis')">📊 数据分析</div>
-        </div>
-        
-        <!-- 仪表板 -->
-        <div id="dashboard" class="tab-content active">
-            <div class="kpi-container">
-                <div class="kpi-card">
-                    <div class="kpi-title">活跃项目数</div>
-                    <div class="kpi-value" id="kpiActive">0</div>
-                    <div class="kpi-trend trend-up">较上月 +2</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">总装修面积</div>
-                    <div class="kpi-value" id="kpiArea">0㎡</div>
-                    <div class="kpi-trend trend-up">环比增长 15%</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">本月违规</div>
-                    <div class="kpi-value" id="kpiViolation">0次</div>
-                    <div class="kpi-trend trend-down">减少 3次</div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">巡检完成率</div>
-                    <div class="kpi-value" id="kpiInspection">0%</div>
-                    <div class="kpi-trend trend-up">提高 5%</div>
-                </div>
-            </div>
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active" onclick="showPage('dashboard')">
+                            <i class="fas fa-tachometer-alt"></i> 总览看板
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('projects')">
+                            <i class="fas fa-project-diagram"></i> 项目管理
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('danger')">
+                            <i class="fas fa-exclamation-triangle"></i> 危险作业
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('inspection')">
+                            <i class="fas fa-clipboard-check"></i> 巡检记录
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('statistics')">
+                            <i class="fas fa-chart-bar"></i> 统计分析
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link" onclick="showPage('settings')">
+                            <i class="fas fa-cog"></i> 系统设置
+                        </a>
+                    </li>
+                </ul>
+            </aside>
             
-            <!-- 预警信息 -->
-            <div class="warning-panel">
-                <h4>⚠️ 风险预警</h4>
-                <div id="warningList"></div>
-            </div>
-            
-            <!-- 项目状态分布 -->
-            <h3>📊 项目状态分布</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>状态</th>
-                        <th>项目数量</th>
-                        <th>占比</th>
-                        <th>总装修面积</th>
-                        <th>平均工期</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="statusDistribution">
-                    <!-- 动态生成 -->
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- 项目管理 -->
-        <div id="projects" class="tab-content">
-            <div class="form-section">
-                <h4>🔍 项目筛选</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div class="form-group">
-                        <label class="form-label">状态筛选</label>
-                        <select class="form-control" onchange="filterProjects()" id="filterStatus">
-                            <option value="">全部状态</option>
-                            <option value="审批中">审批中</option>
-                            <option value="施工中">施工中</option>
-                            <option value="待验收">待验收</option>
-                            <option value="已完成">已完成</option>
-                            <option value="已逾期">已逾期</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">楼层筛选</label>
-                        <input type="text" class="form-control" oninput="filterProjects()" id="filterFloor" placeholder="输入楼层">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">施工方筛选</label>
-                        <input type="text" class="form-control" oninput="filterProjects()" id="filterContractor" placeholder="施工方名称">
-                    </div>
-                </div>
-            </div>
-            
-            <h3>📋 项目列表</h3>
-            <div style="overflow-x: auto;">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th style="width: 80px;">选择</th>
-                            <th>项目ID</th>
-                            <th>租户名称</th>
-                            <th>楼层/单元</th>
-                            <th>装修类型</th>
-                            <th>面积(㎡)</th>
-                            <th>合同工期</th>
-                            <th>当前状态</th>
-                            <th>施工方</th>
-                            <th>负责人</th>
-                            <th>进度</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody id="projectList">
-                        <!-- 动态生成 -->
-                    </tbody>
-                </table>
-            </div>
-            
-            <div class="btn-group" style="margin-top: 20px;">
-                <button class="btn btn-warning" onclick="batchUpdateStatus()">📝 批量更新状态</button>
-                <button class="btn btn-danger" onclick="batchDelete()">🗑️ 批量删除</button>
-                <button class="btn btn-primary" onclick="exportProjects()">📤 导出项目表</button>
-            </div>
-        </div>
-        
-        <!-- 巡检记录 -->
-        <div id="inspection" class="tab-content">
-            <div class="form-section">
-                <h4>📝 新增巡检记录</h4>
-                <form id="inspectionForm" onsubmit="return addInspectionRecord(event)">
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label class="form-label">项目ID</label>
-                            <select class="form-control" required id="inspectionProjectId">
-                                <option value="">选择项目</option>
-                            </select>
+            <!-- 内容区域 -->
+            <main class="content-area">
+                <!-- 总览看板 -->
+                <div id="dashboard-page" class="page-content active-page">
+                    <h2 class="page-title">总览看板</h2>
+                    
+                    <div class="stats-cards">
+                        <div class="stat-card">
+                            <div class="stat-label">活跃项目</div>
+                            <div class="stat-value" id="activeProjects">0</div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">巡检日期</label>
-                            <input type="date" class="form-control" required id="inspectionDate" value="">
+                        <div class="stat-card warning">
+                            <div class="stat-label">危险作业</div>
+                            <div class="stat-value" id="dangerOperations">0</div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">巡检人</label>
-                            <input type="text" class="form-control" required id="inspector" placeholder="巡检人员姓名">
+                        <div class="stat-card danger">
+                            <div class="stat-label">未处理预警</div>
+                            <div class="stat-value" id="pendingWarnings">0</div>
+                        </div>
+                        <div class="stat-card success">
+                            <div class="stat-label">本月完工</div>
+                            <div class="stat-value" id="completedThisMonth">0</div>
                         </div>
                     </div>
                     
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                        <div class="form-group">
-                            <label class="form-label">问题类型</label>
-                            <select class="form-control" required id="problemType">
-                                <option value="">选择类型</option>
-                                <option value="消防违规">消防违规</option>
-                                <option value="安全违规">安全违规</option>
-                                <option value="物料堆放">物料堆放</option>
-                                <option value="噪音扰民">噪音扰民</option>
-                                <option value="环境卫生">环境卫生</option>
-                                <option value="其他">其他</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">严重程度</label>
-                            <select class="form-control" required id="severity">
-                                <option value="低">低</option>
-                                <option value="中">中</option>
-                                <option value="高">高</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">整改期限</label>
-                            <input type="date" class="form-control" required id="rectifyDate">
-                        </div>
+                    <div class="search-box">
+                        <input type="text" class="search-input" placeholder="搜索项目..." onkeyup="searchProjects(this.value)">
                     </div>
                     
-                    <div class="form-group">
-                        <label class="form-label">问题描述</label>
-                        <textarea class="form-control" rows="3" required id="problemDescription" placeholder="详细描述发现的问题..."></textarea>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-success">💾 保存巡检记录</button>
-                    <button type="button" class="btn btn-primary" onclick="generateRandomInspection()">🎲 生成随机巡检</button>
-                </form>
-            </div>
-            
-            <h3>📅 巡检记录列表</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>日期</th>
-                        <th>项目ID</th>
-                        <th>楼层/单元</th>
-                        <th>巡检人</th>
-                        <th>问题类型</th>
-                        <th>严重程度</th>
-                        <th>整改期限</th>
-                        <th>整改状态</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody id="inspectionList">
-                    <!-- 动态生成 -->
-                </tbody>
-            </table>
-        </div>
-        
-        <!-- 数据分析 -->
-        <div id="analysis" class="tab-content">
-            <div class="kpi-container">
-                <div class="kpi-card">
-                    <div class="kpi-title">问题类型分布</div>
-                    <canvas id="problemTypeChart" width="200" height="200"></canvas>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">违规趋势</div>
-                    <canvas id="violationTrendChart" width="200" height="200"></canvas>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-title">施工方评分</div>
-                    <canvas id="contractorScoreChart" width="200" height="200"></canvas>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
-                <div>
-                    <h4>📈 月度统计</h4>
-                    <table class="data-table">
+                    <h3>最近项目</h3>
+                    <table class="data-table" id="recentProjectsTable">
                         <thead>
                             <tr>
-                                <th>月份</th>
-                                <th>开工数</th>
-                                <th>完工数</th>
-                                <th>违规数</th>
-                                <th>巡检数</th>
-                                <th>整改率</th>
+                                <th>项目ID</th>
+                                <th>租户名称</th>
+                                <th>楼层/单元</th>
+                                <th>装修公司</th>
+                                <th>装修类型</th>
+                                <th>状态</th>
+                                <th>危险作业</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody id="monthlyStats">
+                        <tbody id="recentProjectsBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                    
+                    <h3 style="margin-top: 30px;">高风险预警</h3>
+                    <table class="data-table" id="warningTable">
+                        <thead>
+                            <tr>
+                                <th>紧急程度</th>
+                                <th>项目</th>
+                                <th>问题描述</th>
+                                <th>发现时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="warningBody">
                             <!-- 动态生成 -->
                         </tbody>
                     </table>
                 </div>
                 
-                <div>
-                    <h4>🏆 施工方排名</h4>
-                    <table class="data-table">
+                <!-- 项目管理 -->
+                <div id="projects-page" class="page-content" style="display: none;">
+                    <div class="page-header">
+                        <h2 class="page-title">项目管理</h2>
+                        <button class="btn btn-primary" onclick="openNewProjectModal()">
+                            <i class="fas fa-plus"></i> 新增项目
+                        </button>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select class="form-control" style="width: 150px;" onchange="filterByStatus(this.value)">
+                            <option value="">所有状态</option>
+                            <option value="审批中">审批中</option>
+                            <option value="施工中">施工中</option>
+                            <option value="待验收">待验收</option>
+                            <option value="已完工">已完工</option>
+                        </select>
+                        
+                        <select class="form-control" style="width: 150px;" onchange="filterByFloor(this.value)">
+                            <option value="">所有楼层</option>
+                            <!-- 楼层选项动态生成 -->
+                        </select>
+                        
+                        <input type="text" class="search-input" placeholder="搜索租户或项目ID..." onkeyup="searchProjectsTable(this.value)">
+                    </div>
+                    
+                    <table class="data-table" id="projectsTable">
                         <thead>
                             <tr>
-                                <th>排名</th>
-                                <th>施工方</th>
-                                <th>项目数</th>
-                                <th>平均工期</th>
-                                <th>违规率</th>
-                                <th>评分</th>
+                                <th>项目ID</th>
+                                <th>租户名称</th>
+                                <th>楼层/单元</th>
+                                <th>装修公司</th>
+                                <th>装修类型</th>
+                                <th>装修开始</th>
+                                <th>装修结束</th>
+                                <th>状态</th>
+                                <th>危险作业</th>
+                                <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody id="contractorRanking">
+                        <tbody id="projectsBody">
                             <!-- 动态生成 -->
                         </tbody>
                     </table>
                 </div>
-            </div>
+                
+                <!-- 危险作业管理 -->
+                <div id="danger-page" class="page-content" style="display: none;">
+                    <h2 class="page-title">危险作业管理</h2>
+                    
+                    <div class="stats-cards">
+                        <div class="stat-card danger">
+                            <div class="stat-label">高空作业</div>
+                            <div class="stat-value" id="highWorkCount">0</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">动火作业</div>
+                            <div class="stat-value" id="fireWorkCount">0</div>
+                        </div>
+                        <div class="stat-card danger">
+                            <div class="stat-label">有限空间</div>
+                            <div class="stat-value" id="limitedSpaceCount">0</div>
+                        </div>
+                        <div class="stat-card warning">
+                            <div class="stat-label">泄水作业</div>
+                            <div class="stat-value" id="drainageCount">0</div>
+                        </div>
+                    </div>
+                    
+                    <table class="data-table" id="dangerTable">
+                        <thead>
+                            <tr>
+                                <th>危险类型</th>
+                                <th>项目信息</th>
+                                <th>作业地点</th>
+                                <th>计划时间</th>
+                                <th>负责人</th>
+                                <th>监护人员</th>
+                                <th>审批状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dangerBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 巡检记录 -->
+                <div id="inspection-page" class="page-content" style="display: none;">
+                    <h2 class="page-title">巡检记录</h2>
+                    
+                    <button class="btn btn-primary" onclick="openNewInspectionModal()">
+                        <i class="fas fa-plus"></i> 添加巡检记录
+                    </button>
+                    
+                    <table class="data-table" id="inspectionTable">
+                        <thead>
+                            <tr>
+                                <th>巡检日期</th>
+                                <th>项目ID</th>
+                                <th>巡检人</th>
+                                <th>问题类型</th>
+                                <th>问题描述</th>
+                                <th>严重程度</th>
+                                <th>整改状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inspectionBody">
+                            <!-- 动态生成 -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 统计分析 -->
+                <div id="statistics-page" class="page-content" style="display: none;">
+                    <h2 class="page-title">统计分析</h2>
+                    
+                    <div class="form-row">
+                        <select class="form-control" onchange="updateStatistics()">
+                            <option value="month">本月数据</option>
+                            <option value="quarter">本季度数据</option>
+                            <option value="year">本年度数据</option>
+                        </select>
+                    </div>
+                    
+                    <div id="statisticsContent">
+                        <!-- 统计图表和表格动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 系统设置 -->
+                <div id="settings-page" class="page-content" style="display: none;">
+                    <h2 class="page-title">系统设置</h2>
+                    
+                    <div class="form-group">
+                        <label class="form-label">装修类型管理</label>
+                        <div class="form-row">
+                            <input type="text" id="newDecorationType" class="form-control" placeholder="新增装修类型">
+                            <button class="btn btn-success" onclick="addDecorationType()">添加类型</button>
+                        </div>
+                        
+                        <div id="decorationTypesList" style="margin-top: 15px;">
+                            <!-- 装修类型列表 -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">危险作业类型</label>
+                        <div id="dangerTypesList">
+                            <!-- 危险作业类型列表 -->
+                        </div>
+                    </div>
+                </div>
+            </main>
         </div>
     </div>
     
     <!-- 新增项目模态框 -->
-    <div id="addProjectModal" class="modal">
+    <div id="newProjectModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">➕ 新增装修项目</div>
-                <button class="close-btn" onclick="closeModal('addProjectModal')">&times;</button>
+                <h3 class="modal-title">新增装修项目</h3>
+                <button class="close-btn" onclick="closeModal('newProjectModal')">&times;</button>
             </div>
             
-            <form id="projectForm" onsubmit="return saveProject(event)">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <form id="projectForm" onsubmit="saveProject(event)">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">项目ID</label>
+                        <input type="text" class="form-control" id="projectId" value="自动生成" readonly>
+                    </div>
+                    
                     <div class="form-group">
                         <label class="form-label">租户名称 *</label>
-                        <input type="text" class="form-control" required id="tenantName">
+                        <input type="text" class="form-control" id="tenantName" required>
                     </div>
+                </div>
+                
+                <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">楼层 *</label>
-                        <input type="text" class="form-control" required id="floor" placeholder="例如：18F">
+                        <select class="form-control" id="floor" required>
+                            <option value="">请选择楼层</option>
+                            <!-- 楼层选项动态生成 -->
+                        </select>
                     </div>
+                    
                     <div class="form-group">
                         <label class="form-label">单元号 *</label>
-                        <input type="text" class="form-control" required id="unit" placeholder="例如：1805">
+                        <input type="text" class="form-control" id="unitNumber" required>
                     </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">装修公司 *</label>
+                        <input type="text" class="form-control" id="decorationCompany" required>
+                    </div>
+                    
                     <div class="form-group">
                         <label class="form-label">装修类型 *</label>
-                        <select class="form-control" required id="projectType">
-                            <option value="办公室装修">办公室装修</option>
-                            <option value="展厅改造">展厅改造</option>
-                            <option value="会议室改造">会议室改造</option>
-                            <option value="扩租装修">扩租装修</option>
-                            <option value="办公室翻新">办公室翻新</option>
-                        </select>
+                        <div class="form-row">
+                            <select class="form-control" id="decorationType" required>
+                                <option value="">请选择类型</option>
+                                <!-- 装修类型选项动态生成 -->
+                            </select>
+                            <button type="button" class="btn" onclick="openCustomTypeModal()">自定义</button>
+                        </div>
                     </div>
+                </div>
+                
+                <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">装修面积(㎡) *</label>
-                        <input type="number" class="form-control" required id="area" min="50" max="1000">
+                        <label class="form-label">装修开始日期 *</label>
+                        <input type="date" class="form-control" id="decorationStartDate" required>
                     </div>
+                    
                     <div class="form-group">
-                        <label class="form-label">合同金额(元) *</label>
-                        <input type="number" class="form-control" required id="amount" min="50000">
+                        <label class="form-label">装修结束日期 *</label>
+                        <input type="date" class="form-control" id="decorationEndDate" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">施工方 *</label>
-                        <input type="text" class="form-control" required id="contractor">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">负责人 *</label>
-                        <input type="text" class="form-control" required id="manager">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">联系电话 *</label>
-                        <input type="tel" class="form-control" required id="phone">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">合同开始日期 *</label>
-                        <input type="date" class="form-control" required id="startDate">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">合同结束日期 *</label>
-                        <input type="date" class="form-control" required id="endDate">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">预计工期(天)</label>
-                        <input type="number" class="form-control" id="estimatedDays" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">初始状态</label>
-                        <select class="form-control" id="initialStatus">
-                            <option value="审批中">审批中</option>
-                            <option value="待进场">待进场</option>
-                            <option value="施工中" selected>施工中</option>
-                        </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">装修面积(㎡)</label>
+                    <input type="number" class="form-control" id="decorationArea">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">项目负责人</label>
+                    <input type="text" class="form-control" id="projectManager">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">联系电话</label>
+                    <input type="tel" class="form-control" id="contactPhone">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">危险作业类型（可多选）</label>
+                    <div class="checkbox-group" id="dangerCheckboxes">
+                        <!-- 危险作业复选框动态生成 -->
                     </div>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">备注</label>
-                    <textarea class="form-control" rows="2" id="remarks" placeholder="项目特殊要求或注意事项..."></textarea>
+                    <textarea class="form-control" id="projectRemark" rows="3"></textarea>
                 </div>
                 
-                <div style="text-align: right; margin-top: 20px;">
-                    <button type="button" class="btn btn-warning" onclick="generateRandomProject()">🎲 生成随机项目</button>
-                    <button type="submit" class="btn btn-success">💾 保存项目</button>
+                <div class="form-group" style="text-align: right;">
+                    <button type="button" class="btn" onclick="closeModal('newProjectModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存项目</button>
                 </div>
             </form>
         </div>
     </div>
     
-    <!-- 批量操作模态框 -->
-    <div id="batchModal" class="modal">
+    <!-- 自定义装修类型模态框 -->
+    <div id="customTypeModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title">📝 批量操作</div>
-                <button class="close-btn" onclick="closeModal('batchModal')">&times;</button>
+                <h3 class="modal-title">自定义装修类型</h3>
+                <button class="close-btn" onclick="closeModal('customTypeModal')">&times;</button>
             </div>
             
             <div class="form-group">
-                <label class="form-label">选择操作类型</label>
-                <select class="form-control" id="batchAction">
-                    <option value="updateStatus">更新状态</option>
-                    <option value="markInspection">标记巡检</option>
-                    <option value="addProgress">更新进度</option>
+                <label class="form-label">新的装修类型名称</label>
+                <input type="text" class="form-control" id="customTypeName">
+            </div>
+            
+            <div class="form-group" style="text-align: right;">
+                <button type="button" class="btn" onclick="closeModal('customTypeModal')">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveCustomType()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑项目模态框 -->
+    <div id="editProjectModal" class="modal">
+        <div class="modal-content">
+            <!-- 编辑项目表单（结构与新增相似） -->
+        </div>
+    </div>
+    
+    <!-- 标记操作模态框 -->
+    <div id="markModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">标记操作</h3>
+                <button class="close-btn" onclick="closeModal('markModal')">&times;</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">标记类型</label>
+                <select class="form-control" id="markType">
+                    <option value="warning">问题预警</option>
+                    <option value="danger">危险作业</option>
+                    <option value="delay">进度延迟</option>
+                    <option value="completed">完工验收</option>
                 </select>
             </div>
             
-            <div id="batchContent">
-                <!-- 动态内容 -->
+            <div class="form-group">
+                <label class="form-label">描述信息</label>
+                <textarea class="form-control" id="markDescription" rows="4"></textarea>
             </div>
             
-            <button class="btn btn-success" onclick="executeBatchAction()">✅ 执行批量操作</button>
+            <div class="form-group" style="text-align: right;">
+                <button type="button" class="btn" onclick="closeModal('markModal')">取消</button>
+                <button type="button" class="btn btn-primary" onclick="saveMark()">确认标记</button>
+            </div>
         </div>
     </div>
 
-    <!-- 引入Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
     <script>
         // 数据存储
-        let projects = [];
-        let inspections = [];
-        let selectedProjects = new Set();
+        let projects = JSON.parse(localStorage.getItem('decorationProjects')) || [];
+        let inspectionRecords = JSON.parse(localStorage.getItem('inspectionRecords')) || [];
+        let decorationTypes = JSON.parse(localStorage.getItem('decorationTypes')) || [
+            '办公室装修', '展厅改造', '会议室改造', '扩租装修', '办公室翻新',
+            '卫生间改造', '强弱电改造', '消防系统改造', '空调系统改造', '外立面装修'
+        ];
+        let dangerOperations = JSON.parse(localStorage.getItem('dangerOperations')) || [];
+        let currentProjectId = null;
         
-        // 初始化示例数据
-        function initSampleData() {
-            projects = [
-                {
-                    id: 'P24001',
-                    tenant: '宏远科技',
-                    floor: '18F',
-                    unit: '1805',
-                    type: '展厅改造',
-                    area: 350,
-                    amount: 280000,
-                    startDate: '2024-01-10',
-                    endDate: '2024-02-20',
-                    actualStart: '2024-01-12',
-                    status: '施工中',
-                    contractor: '城建装饰',
-                    manager: '王经理',
-                    phone: '138****5678',
-                    progress: 65,
-                    remarks: '重点客户，需每日巡检'
-                },
-                {
-                    id: 'P24002',
-                    tenant: '创意设计',
-                    floor: '12F',
-                    unit: '1202',
-                    type: '办公室装修',
-                    area: 180,
-                    amount: 150000,
-                    startDate: '2024-01-15',
-                    endDate: '2024-03-01',
-                    actualStart: '2024-01-15',
-                    status: '施工中',
-                    contractor: '美居装饰',
-                    manager: '李工',
-                    phone: '139****1234',
-                    progress: 45,
-                    remarks: '动火作业多，需重点监管'
-                }
-            ];
+        // 危险作业类型
+        const DANGER_TYPES = [
+            { id: 'high-altitude', name: '高空作业', color: '#f5222d' },
+            { id: 'fire-work', name: '动火作业', color: '#fa8c16' },
+            { id: 'drainage', name: '泄水作业', color: '#1890ff' },
+            { id: 'limited-space', name: '有限空间作业', color: '#722ed1' }
+        ];
+        
+        // 初始化
+        function init() {
+            updateCurrentDate();
+            loadDashboardData();
+            loadProjectsTable();
+            loadDangerOperations();
+            loadInspectionRecords();
+            initSettings();
             
-            inspections = [
-                {
-                    id: 'INS001',
-                    projectId: 'P24001',
-                    date: '2024-01-18',
-                    inspector: '张三',
-                    problemType: '消防违规',
-                    description: '灭火器被建筑材料遮挡',
-                    severity: '中',
-                    rectifyDate: '2024-01-19',
-                    rectifyStatus: '已完成',
-                    reviewPerson: '李四',
-                    reviewDate: '2024-01-19'
-                }
-            ];
+            // 设置默认日期
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30);
             
-            updateAllViews();
+            document.getElementById('decorationStartDate').value = formatDate(today);
+            document.getElementById('decorationEndDate').value = formatDate(endDate);
+            
+            // 初始化楼层选项
+            initFloorOptions();
+            // 初始化装修类型选项
+            initDecorationTypeOptions();
+            // 初始化危险作业复选框
+            initDangerCheckboxes();
         }
         
-        // 更新所有视图
-        function updateAllViews() {
-            updateProjectList();
-            updateInspectionList();
-            updateDashboard();
-            updateAnalysis();
-            updateProjectSelect();
+        // 更新当前日期
+        function updateCurrentDate() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                weekday: 'long'
+            };
+            document.getElementById('currentDate').textContent = 
+                now.toLocaleDateString('zh-CN', options);
         }
         
-        // 切换标签页
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        // 加载仪表板数据
+        function loadDashboardData() {
+            // 统计活跃项目
+            const activeProjects = projects.filter(p => 
+                p.status === '施工中' || p.status === '审批中'
+            ).length;
+            document.getElementById('activeProjects').textContent = activeProjects;
             
+            // 统计危险作业
+            const dangerOps = projects.reduce((count, project) => {
+                return count + (project.dangerOperations?.length || 0);
+            }, 0);
+            document.getElementById('dangerOperations').textContent = dangerOps;
+            
+            // 统计未处理预警
+            const warnings = inspectionRecords.filter(r => 
+                r.severity === '高' && r.status !== '已完成'
+            ).length;
+            document.getElementById('pendingWarnings').textContent = warnings;
+            
+            // 统计本月完工
+            const thisMonth = new Date().getMonth();
+            const completed = projects.filter(p => {
+                if (p.status === '已完工' && p.completedDate) {
+                    const completedMonth = new Date(p.completedDate).getMonth();
+                    return completedMonth === thisMonth;
+                }
+                return false;
+            }).length;
+            document.getElementById('completedThisMonth').textContent = completed;
+            
+            // 加载最近项目
+            loadRecentProjects();
+            // 加载预警列表
+            loadWarnings();
+        }
+        
+        // 加载最近项目
+        function loadRecentProjects() {
+            const tbody = document.getElementById('recentProjectsBody');
+            tbody.innerHTML = '';
+            
+            const recentProjects = projects.slice(0, 5); // 显示最近5个项目
+            
+            recentProjects.forEach(project => {
+                const row = document.createElement('tr');
+                
+                // 危险作业标签
+                const dangerTags = project.dangerOperations?.map(op => 
+                    `<span class="danger-tag">${op}</span>`
+                ).join('') || '';
+                
+                row.innerHTML = `
+                    <td>${project.id}</td>
+                    <td>${project.tenantName}</td>
+                    <td>${project.floor}-${project.unitNumber}</td>
+                    <td>${project.decorationCompany}</td>
+                    <td>${project.decorationType}</td>
+                    <td><span class="status-badge status-${getStatusClass(project.status)}">${project.status}</span></td>
+                    <td>${dangerTags}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editProject('${project.id}')">编辑</button>
+                        <button class="action-btn mark-btn" onclick="openMarkModal('${project.id}')">标记</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 加载预警列表
+        function loadWarnings() {
+            const tbody = document.getElementById('warningBody');
+            tbody.innerHTML = '';
+            
+            const highSeverityWarnings = inspectionRecords
+                .filter(r => r.severity === '高' && r.status !== '已完成')
+                .slice(0, 5);
+            
+            highSeverityWarnings.forEach(warning => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="status-badge status-delay">高风险</span></td>
+                    <td>${warning.projectId}</td>
+                    <td>${warning.description}</td>
+                    <td>${warning.date}</td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="handleWarning('${warning.id}')">处理</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 加载项目表格
+        function loadProjectsTable() {
+            const tbody = document.getElementById('projectsBody');
+            tbody.innerHTML = '';
+            
+            projects.forEach(project => {
+                const row = document.createElement('tr');
+                
+                // 危险作业标签
+                const dangerTags = project.dangerOperations?.map(op => 
+                    `<span class="danger-tag">${op}</span>`
+                ).join('') || '';
+                
+                row.innerHTML = `
+                    <td>${project.id}</td>
+                    <td>${project.tenantName}</td>
+                    <td>${project.floor}-${project.unitNumber}</td>
+                    <td>${project.decorationCompany}</td>
+                    <td>${project.decorationType}</td>
+                    <td>${project.decorationStartDate}</td>
+                    <td>${project.decorationEndDate}</td>
+                    <td><span class="status-badge status-${getStatusClass(project.status)}">${project.status}</span></td>
+                    <td>${dangerTags}</td>
+                    <td class="btn-group">
+                        <button class="action-btn edit-btn" onclick="editProject('${project.id}')">编辑</button>
+                        <button class="action-btn mark-btn" onclick="openMarkModal('${project.id}')">标记</button>
+                        <button class="action-btn delete-btn" onclick="deleteProject('${project.id}')">删除</button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 加载危险作业
+        function loadDangerOperations() {
+            // 更新统计卡片
+            const highWorkCount = projects.reduce((count, project) => 
+                count + (project.dangerOperations?.includes('高空作业') ? 1 : 0), 0);
+            const fireWorkCount = projects.reduce((count, project) => 
+                count + (project.dangerOperations?.includes('动火作业') ? 1 : 0), 0);
+            const limitedSpaceCount = projects.reduce((count, project) => 
+                count + (project.dangerOperations?.includes('有限空间作业') ? 1 : 0), 0);
+            const drainageCount = projects.reduce((count, project) => 
+                count + (project.dangerOperations?.includes('泄水作业') ? 1 : 0), 0);
+            
+            document.getElementById('highWorkCount').textContent = highWorkCount;
+            document.getElementById('fireWorkCount').textContent = fireWorkCount;
+            document.getElementById('limitedSpaceCount').textContent = limitedSpaceCount;
+            document.getElementById('drainageCount').textContent = drainageCount;
+            
+            // 加载危险作业表格
+            const tbody = document.getElementById('dangerBody');
+            tbody.innerHTML = '';
+            
+            projects.forEach(project => {
+                if (project.dangerOperations && project.dangerOperations.length > 0) {
+                    project.dangerOperations.forEach(dangerOp => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td><span class="danger-tag">${dangerOp}</span></td>
+                            <td>${project.id}<br>${project.tenantName}</td>
+                            <td>${project.floor}-${project.unitNumber}</td>
+                            <td>${project.decorationStartDate} 至 ${project.decorationEndDate}</td>
+                            <td>${project.projectManager || '未指定'}</td>
+                            <td>${project.supervisor || '未指定'}</td>
+                            <td><span class="status-badge status-${getStatusClass(project.status)}">${project.status}</span></td>
+                            <td>
+                                <button class="action-btn edit-btn" onclick="editProject('${project.id}')">详情</button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            });
+        }
+        
+        // 加载巡检记录
+        function loadInspectionRecords() {
+            const tbody = document.getElementById('inspectionBody');
+            tbody.innerHTML = '';
+            
+            inspectionRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.date}</td>
+                    <td>${record.projectId}</td>
+                    <td>${record.inspector}</td>
+                    <td>${record.problemType}</td>
+                    <td>${record.description}</td>
+                    <td><span class="status-badge ${record.severity === '高' ? 'status-delay' : 'status-approval'}">${record.severity}</span></td>
+                    <td><span class="status-badge ${record.status === '已完成' ? 'status-completed' : 'status-delay'}">${record.status}</span></td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="editInspection('${record.id}')">编辑</button>
+                        <button class="action-btn delete-btn" onclick="deleteInspection('${record.id}')">删除</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // 初始化设置
+        function initSettings() {
+            loadDecorationTypes();
+            loadDangerTypes();
+        }
+        
+        // 加载装修类型
+        function loadDecorationTypes() {
+            const container = document.getElementById('decorationTypesList');
+            container.innerHTML = '<div style="margin-bottom: 10px;">已配置的类型：</div>';
+            
+            decorationTypes.forEach((type, index) => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;';
+                item.innerHTML = `
+                    <span>${type}</span>
+                    <button class="action-btn delete-btn" onclick="removeDecorationType(${index})">删除</button>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 加载危险作业类型
+        function loadDangerTypes() {
+            const container = document.getElementById('dangerTypesList');
+            container.innerHTML = '';
+            
+            DANGER_TYPES.forEach(type => {
+                const item = document.createElement('div');
+                item.style.cssText = 'display: inline-block; margin: 5px; padding: 8px 12px; background-color: #f5f5f5; border-radius: 4px;';
+                item.innerHTML = `
+                    <span style="color: ${type.color}; font-weight: bold;">${type.name}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+        
+        // 页面切换
+        function showPage(pageId) {
+            // 隐藏所有页面
+            document.querySelectorAll('.page-content').forEach(page => {
+                page.style.display = 'none';
+            });
+            
+            // 移除所有导航激活状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // 显示目标页面
+            document.getElementById(pageId + '-page').style.display = 'block';
+            
+            // 激活对应导航
             event.target.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
+            
+            // 更新页面数据
+            switch(pageId) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'projects':
+                    loadProjectsTable();
+                    break;
+                case 'danger':
+                    loadDangerOperations();
+                    break;
+                case 'inspection':
+                    loadInspectionRecords();
+                    break;
+                case 'statistics':
+                    updateStatistics();
+                    break;
+            }
         }
         
-        // 显示新增项目表单
-        function showAddForm() {
-            document.getElementById('startDate').value = new Date().toISOString().split('T')[0];
-            let endDate = new Date();
-            endDate.setDate(endDate.getDate() + 45);
-            document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
-            calculateEstimatedDays();
+        // 打开新增项目模态框
+        function openNewProjectModal() {
+            // 生成项目ID
+            const projectId = 'P' + new Date().getFullYear().toString().substr(2) + 
+                           String(projects.length + 1).padStart(3, '0');
+            document.getElementById('projectId').value = projectId;
             
-            showModal('addProjectModal');
-        }
-        
-        // 计算预计工期
-        function calculateEstimatedDays() {
-            const start = new Date(document.getElementById('startDate').value);
-            const end = new Date(document.getElementById('endDate').value);
-            const diffTime = Math.abs(end - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            document.getElementById('estimatedDays').value = diffDays;
-        }
-        
-        // 生成随机项目
-        function generateRandomProject() {
-            const tenants = ['腾讯科技', '阿里巴巴', '百度科技', '字节跳动', '华为技术', '小米科技', '京东集团', '美团点评'];
-            const contractors = ['中建装饰', '华润建设', '万科装修', '龙湖工程', '保利装饰', '恒大装饰', '碧桂园工程'];
-            const types = ['办公室装修', '展厅改造', '会议室改造', '扩租装修', '办公室翻新'];
+            // 重置表单
+            document.getElementById('projectForm').reset();
             
-            document.getElementById('tenantName').value = tenants[Math.floor(Math.random() * tenants.length)];
-            document.getElementById('floor').value = (Math.floor(Math.random() * 25) + 1) + 'F';
-            document.getElementById('unit').value = Math.floor(Math.random() * 20 + 1000);
-            document.getElementById('projectType').value = types[Math.floor(Math.random() * types.length)];
-            document.getElementById('area').value = Math.floor(Math.random() * 300 + 50);
-            document.getElementById('amount').value = Math.floor(Math.random() * 200000 + 50000);
-            document.getElementById('contractor').value = contractors[Math.floor(Math.random() * contractors.length)];
-            document.getElementById('manager').value = ['张经理', '李经理', '王总', '陈工', '刘工'][Math.floor(Math.random() * 5)];
-            document.getElementById('phone').value = '138' + Math.floor(Math.random() * 100000000).toString().padStart(8, '0');
+            // 设置默认日期
+            const today = new Date();
+            const endDate = new Date(today);
+            endDate.setDate(today.getDate() + 30);
             
-            const start = new Date();
-            start.setDate(start.getDate() + Math.floor(Math.random() * 30));
-            document.getElementById('startDate').value = start.toISOString().split('T')[0];
+            document.getElementById('decorationStartDate').value = formatDate(today);
+            document.getElementById('decorationEndDate').value = formatDate(endDate);
             
-            const end = new Date(start);
-            end.setDate(end.getDate() + Math.floor(Math.random() * 60 + 30));
-            document.getElementById('endDate').value = end.toISOString().split('T')[0];
-            
-            calculateEstimatedDays();
+            openModal('newProjectModal');
         }
         
         // 保存项目
         function saveProject(event) {
             event.preventDefault();
             
-            const projectId = 'P' + new Date().getFullYear().toString().substr(2) + 
-                            String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
-            
             const project = {
-                id: projectId,
-                tenant: document.getElementById('tenantName').value,
+                id: document.getElementById('projectId').value,
+                tenantName: document.getElementById('tenantName').value,
                 floor: document.getElementById('floor').value,
-                unit: document.getElementById('unit').value,
-                type: document.getElementById('projectType').value,
-                area: parseInt(document.getElementById('area').value),
-                amount: parseInt(document.getElementById('amount').value),
-                startDate: document.getElementById('startDate').value,
-                endDate: document.getElementById('endDate').value,
-                actualStart: document.getElementById('initialStatus').value === '施工中' ? 
-                            document.getElementById('startDate').value : '',
-                status: document.getElementById('initialStatus').value,
-                contractor: document.getElementById('contractor').value,
-                manager: document.getElementById('manager').value,
-                phone: document.getElementById('phone').value,
-                progress: document.getElementById('initialStatus').value === '施工中' ? 
-                         Math.floor(Math.random() * 30) + 10 : 0,
-                remarks: document.getElementById('remarks').value
+                unitNumber: document.getElementById('unitNumber').value,
+                decorationCompany: document.getElementById('decorationCompany').value,
+                decorationType: document.getElementById('decorationType').value,
+                decorationStartDate: document.getElementById('decorationStartDate').value,
+                decorationEndDate: document.getElementById('decorationEndDate').value,
+                decorationArea: document.getElementById('decorationArea').value,
+                projectManager: document.getElementById('projectManager').value,
+                contactPhone: document.getElementById('contactPhone').value,
+                dangerOperations: getSelectedDangerOperations(),
+                remark: document.getElementById('projectRemark').value,
+                status: '审批中',
+                createdAt: new Date().toISOString()
             };
             
             projects.push(project);
-            updateAllViews();
-            closeModal('addProjectModal');
-            alert('项目保存成功！项目ID: ' + projectId);
+            saveToLocalStorage();
             
-            // 清空表单
-            document.getElementById('projectForm').reset();
+            closeModal('newProjectModal');
+            alert('项目保存成功！');
+            
+            // 刷新数据
+            loadDashboardData();
+            loadProjectsTable();
+            loadDangerOperations();
         }
         
-        // 生成示例数据
-        function generateSampleData() {
-            // 生成项目数据
-            const sampleProjects = [
-                {
-                    id: 'P24003',
-                    tenant: '律师事务所',
-                    floor: '9F',
-                    unit: '0911',
-                    type: '扩租装修',
-                    area: 220,
-                    amount: 200000,
-                    startDate: '2024-01-20',
-                    endDate: '2024-03-10',
-                    actualStart: '',
-                    status: '审批中',
-                    contractor: '华建工程',
-                    manager: '张总',
-                    phone: '137****8765',
-                    progress: 0,
-                    remarks: '等待消防局批复'
-                },
-                {
-                    id: 'P24004',
-                    tenant: '金融公司',
-                    floor: '22F',
-                    unit: '2208',
-                    type: '会议室改造',
-                    area: 120,
-                    amount: 100000,
-                    startDate: '2024-01-05',
-                    endDate: '2024-02-05',
-                    actualStart: '2024-01-05',
-                    status: '待验收',
-                    contractor: '迅捷装修',
-                    manager: '刘经理',
-                    phone: '136****4321',
-                    progress: 95,
-                    remarks: '本周安排最终验收'
-                },
-                {
-                    id: 'P24005',
-                    tenant: '科技公司',
-                    floor: '15F',
-                    unit: '1503',
-                    type: '办公室翻新',
-                    area: 200,
-                    amount: 180000,
-                    startDate: '2024-01-08',
-                    endDate: '2024-02-15',
-                    actualStart: '2024-01-10',
-                    status: '施工中',
-                    contractor: '精工装饰',
-                    manager: '陈工',
-                    phone: '135****9876',
-                    progress: 75,
-                    remarks: '进度正常'
-                }
-            ];
-            
-            // 生成巡检数据
-            const sampleInspections = [
-                {
-                    id: 'INS002',
-                    projectId: 'P24002',
-                    date: '2024-01-18',
-                    inspector: '张三',
-                    problemType: '安全违规',
-                    description: '工人未戴安全帽',
-                    severity: '高',
-                    rectifyDate: '2024-01-18',
-                    rectifyStatus: '处理中',
-                    reviewPerson: '',
-                    reviewDate: ''
-                },
-                {
-                    id: 'INS003',
-                    projectId: 'P24004',
-                    date: '2024-01-17',
-                    inspector: '李四',
-                    problemType: '噪音扰民',
-                    description: '午间施工被投诉',
-                    severity: '中',
-                    rectifyDate: '2024-01-18',
-                    rectifyStatus: '已完成',
-                    reviewPerson: '王五',
-                    reviewDate: '2024-01-18'
-                }
-            ];
-            
-            projects = [...projects, ...sampleProjects];
-            inspections = [...inspections, ...sampleInspections];
-            
-            updateAllViews();
-            alert('已生成示例数据！');
-        }
-        
-        // 更新项目列表
-        function updateProjectList() {
-            const filterStatus = document.getElementById('filterStatus').value;
-            const filterFloor = document.getElementById('filterFloor').value.toLowerCase();
-            const filterContractor = document.getElementById('filterContractor').value.toLowerCase();
-            
-            const filteredProjects = projects.filter(project => {
-                return (!filterStatus || project.status === filterStatus) &&
-                       (!filterFloor || project.floor.toLowerCase().includes(filterFloor)) &&
-                       (!filterContractor || project.contractor.toLowerCase().includes(filterContractor));
+        // 获取选中的危险作业
+        function getSelectedDangerOperations() {
+            const selected = [];
+            document.querySelectorAll('#dangerCheckboxes input[type="checkbox"]:checked').forEach(checkbox => {
+                selected.push(checkbox.value);
             });
-            
-            const tbody = document.getElementById('projectList');
-            tbody.innerHTML = '';
-            
-            filteredProjects.forEach(project => {
-                const isSelected = selectedProjects.has(project.id);
-                const row = document.createElement('tr');
-                if (isSelected) row.classList.add('selected');
-                
-                const estimatedDays = Math.ceil((new Date(project.endDate) - new Date(project.startDate)) / (1000 * 60 * 60 * 24));
-                const actualDays = project.actualStart ? 
-                    Math.ceil((new Date() - new Date(project.actualStart)) / (1000 * 60 * 60 * 24)) : 0;
-                const progressPercent = project.progress || 0;
-                
-                row.innerHTML = `
-                    <td><input type="checkbox" onchange="toggleProjectSelection('${project.id}')" ${isSelected ? 'checked' : ''}></td>
-                    <td><strong>${project.id}</strong></td>
-                    <td>${project.tenant}</td>
-                    <td>${project.floor}-${project.unit}</td>
-                    <td>${project.type}</td>
-                    <td>${project.area}㎡</td>
-                    <td>${project.startDate} 至 ${project.endDate}<br><small>预计${estimatedDays}天</small></td>
-                    <td><span class="status-badge status-${getStatusClass(project.status)}">${project.status}</span></td>
-                    <td>${project.contractor}</td>
-                    <td>${project.manager}<br><small>${project.phone}</small></td>
-                    <td>
-                        <div style="background: #f0f0f0; height: 20px; border-radius: 10px; overflow: hidden;">
-                            <div style="background: #52c41a; height: 100%; width: ${progressPercent}%; 
-                                        text-align: center; color: white; font-size: 12px; line-height: 20px;">
-                                ${progressPercent}%
-                            </div>
-                        </div>
-                        ${actualDays > 0 ? `<small>已施工${actualDays}天</small>` : ''}
-                    </td>
-                    <td>
-                        <button class="mark-btn" onclick="updateProjectStatus('${project.id}', '施工中')" style="background: #e6f7ff; color: #1890ff;">开工</button>
-                        <button class="mark-btn" onclick="updateProjectStatus('${project.id}', '待验收')" style="background: #f6ffed; color: #52c41a;">待验</button>
-                        <button class="mark-btn" onclick="updateProjectStatus('${project.id}', '已完成')" style="background: #d9f7be; color: #389e0d;">完工</button>
-                        <button class="mark-btn" onclick="updateProjectStatus('${project.id}', '已逾期')" style="background: #fff1f0; color: #ff4d4f;">逾期</button>
-                        <button class="mark-btn" onclick="editProject('${project.id}')" style="background: #fff7e6; color: #fa8c16;">编辑</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
+            return selected;
         }
         
-        // 获取状态对应的CSS类
-        function getStatusClass(status) {
-            switch(status) {
-                case '审批中': return 'processing';
-                case '施工中': return 'processing';
-                case '待验收': return 'warning';
-                case '已完成': return 'completed';
-                case '已逾期': return 'delay';
-                default: return 'new';
-            }
-        }
-        
-        // 切换项目选择
-        function toggleProjectSelection(projectId) {
-            if (selectedProjects.has(projectId)) {
-                selectedProjects.delete(projectId);
-            } else {
-                selectedProjects.add(projectId);
-            }
-            updateProjectList();
-        }
-        
-        // 更新项目状态
-        function updateProjectStatus(projectId, newStatus) {
+        // 编辑项目
+        function editProject(projectId) {
             const project = projects.find(p => p.id === projectId);
-            if (project) {
-                project.status = newStatus;
-                
-                // 如果是"施工中"状态且还未记录实际开始日期，则记录当前日期
-                if (newStatus === '施工中' && !project.actualStart) {
-                    project.actualStart = new Date().toISOString().split('T')[0];
-                    project.progress = Math.floor(Math.random() * 20) + 5;
+            if (!project) return;
+            
+            // 填充编辑表单（这里简化为使用新增表单）
+            Object.keys(project).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = project[key];
                 }
-                
-                // 如果是"已完成"状态，进度设为100%
-                if (newStatus === '已完成') {
-                    project.progress = 100;
-                }
-                
-                updateAllViews();
-                alert(`项目 ${projectId} 状态已更新为 ${newStatus}`);
-            }
-        }
-        
-        // 批量更新状态
-        function batchUpdateStatus() {
-            if (selectedProjects.size === 0) {
-                alert('请先选择要操作的项目！');
-                return;
-            }
-            
-            document.getElementById('batchContent').innerHTML = `
-                <div class="form-group">
-                    <label class="form-label">选择新的状态</label>
-                    <select class="form-control" id="newBatchStatus">
-                        <option value="施工中">施工中</option>
-                        <option value="待验收">待验收</option>
-                        <option value="已完成">已完成</option>
-                        <option value="已逾期">已逾期</option>
-                    </select>
-                </div>
-                <p>将对 ${selectedProjects.size} 个项目进行状态更新</p>
-            `;
-            
-            showModal('batchModal');
-        }
-        
-        // 执行批量操作
-        function executeBatchAction() {
-            const action = document.getElementById('batchAction').value;
-            
-            if (action === 'updateStatus') {
-                const newStatus = document.getElementById('newBatchStatus').value;
-                selectedProjects.forEach(projectId => {
-                    updateProjectStatus(projectId, newStatus);
-                });
-                alert(`已批量更新 ${selectedProjects.size} 个项目状态为 ${newStatus}`);
-            }
-            
-            selectedProjects.clear();
-            updateAllViews();
-            closeModal('batchModal');
-        }
-        
-        // 批量删除
-        function batchDelete() {
-            if (selectedProjects.size === 0) {
-                alert('请先选择要删除的项目！');
-                return;
-            }
-            
-            if (confirm(`确认要删除 ${selectedProjects.size} 个项目吗？`)) {
-                projects = projects.filter(project => !selectedProjects.has(project.id));
-                selectedProjects.clear();
-                updateAllViews();
-                alert('删除成功！');
-            }
-        }
-        
-        // 更新巡检记录列表
-        function updateInspectionList() {
-            const tbody = document.getElementById('inspectionList');
-            tbody.innerHTML = '';
-            
-            inspections.forEach(inspection => {
-                const project = projects.find(p => p.id === inspection.projectId);
-                const location = project ? `${project.floor}-${project.unit}` : '未知';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${inspection.date}</td>
-                    <td>${inspection.projectId}</td>
-                    <td>${location}</td>
-                    <td>${inspection.inspector}</td>
-                    <td>${inspection.problemType}</td>
-                    <td><span class="status-badge status-${inspection.severity === '高' ? 'delay' : inspection.severity === '中' ? 'warning' : 'completed'}">
-                        ${inspection.severity}
-                    </span></td>
-                    <td>${inspection.rectifyDate}</td>
-                    <td><span class="status-badge status-${inspection.rectifyStatus === '已完成' ? 'completed' : 'processing'}">
-                        ${inspection.rectifyStatus}
-                    </span></td>
-                    <td>
-                        <button class="mark-btn" onclick="markRectification('${inspection.id}', '已完成')">整改完成</button>
-                        <button class="mark-btn" onclick="markRectification('${inspection.id}', '处理中')">处理中</button>
-                        <button class="mark-btn" onclick="deleteInspection('${inspection.id}')">删除</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
             });
+            
+            // 设置危险作业复选框
+            document.querySelectorAll('#dangerCheckboxes input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = project.dangerOperations?.includes(checkbox.value) || false;
+            });
+            
+            currentProjectId = projectId;
+            openModal('newProjectModal');
         }
         
-        // 标记整改状态
-        function markRectification(inspectionId, status) {
-            const inspection = inspections.find(i => i.id === inspectionId);
-            if (inspection) {
-                inspection.rectifyStatus = status;
-                if (status === '已完成') {
-                    inspection.reviewPerson = ['张三', '李四', '王五'][Math.floor(Math.random() * 3)];
-                    inspection.reviewDate = new Date().toISOString().split('T')[0];
-                }
-                updateInspectionList();
-                alert('整改状态已更新！');
+        // 删除项目
+        function deleteProject(projectId) {
+            if (confirm('确定要删除这个项目吗？')) {
+                projects = projects.filter(p => p.id !== projectId);
+                saveToLocalStorage();
+                loadProjectsTable();
+                loadDashboardData();
+                alert('项目已删除！');
             }
         }
         
-        // 添加巡检记录
-        function addInspectionRecord(event) {
-            event.preventDefault();
+        // 打开标记模态框
+        function openMarkModal(projectId) {
+            currentProjectId = projectId;
+            openModal('markModal');
+        }
+        
+        // 保存标记
+        function saveMark() {
+            const markType = document.getElementById('markType').value;
+            const description = document.getElementById('markDescription').value;
             
-            const inspectionId = 'INS' + String(Math.floor(Math.random() * 900) + 100).padStart(3, '0');
-            
-            const inspection = {
-                id: inspectionId,
-                projectId: document.getElementById('inspectionProjectId').value,
-                date: document.getElementById('inspectionDate').value,
-                inspector: document.getElementById('inspector').value,
-                problemType: document.getElementById('problemType').value,
-                description: document.getElementById('problemDescription').value,
-                severity: document.getElementById('severity').value,
-                rectifyDate: document.getElementById('rectifyDate').value,
-                rectifyStatus: '处理中',
-                reviewPerson: '',
-                reviewDate: ''
+            // 创建巡检记录
+            const inspectionRecord = {
+                id: 'IN' + Date.now(),
+                date: formatDate(new Date()),
+                projectId: currentProjectId,
+                inspector: '系统标记',
+                problemType: getMarkTypeText(markType),
+                description: description,
+                severity: markType === 'danger' ? '高' : '中',
+                status: '未处理',
+                createdAt: new Date().toISOString()
             };
             
-            inspections.push(inspection);
-            updateAllViews();
-            alert('巡检记录添加成功！');
+            inspectionRecords.push(inspectionRecord);
+            saveToLocalStorage();
             
-            // 清空表单
-            document.getElementById('inspectionForm').reset();
-            document.getElementById('inspectionDate').value = new Date().toISOString().split('T')[0];
+            closeModal('markModal');
+            alert('标记已保存！');
+            
+            // 如果是危险标记，更新项目状态
+            if (markType === 'danger') {
+                const project = projects.find(p => p.id === currentProjectId);
+                if (project) {
+                    if (!project.dangerOperations) {
+                        project.dangerOperations = [];
+                    }
+                    if (!project.dangerOperations.includes('其他危险作业')) {
+                        project.dangerOperations.push('其他危险作业');
+                    }
+                    saveToLocalStorage();
+                    loadDangerOperations();
+                }
+            }
+            
+            loadInspectionRecords();
+            loadDashboardData();
         }
         
-        // 生成随机巡检记录
-        function generateRandomInspection() {
-            if (projects.length === 0) {
-                alert('请先创建项目！');
+        // 获取标记类型文本
+        function getMarkTypeText(type) {
+            const types = {
+                'warning': '问题预警',
+                'danger': '危险作业',
+                'delay': '进度延迟',
+                'completed': '完工验收'
+            };
+            return types[type] || '其他';
+        }
+        
+        // 添加装修类型
+        function addDecorationType() {
+            const newType = document.getElementById('newDecorationType').value.trim();
+            if (!newType) {
+                alert('请输入装修类型名称');
                 return;
             }
             
-            const problemTypes = ['消防违规', '安全违规', '物料堆放', '噪音扰民', '环境卫生', '施工安全'];
-            const descriptions = [
-                '灭火器被遮挡无法使用',
-                '工人未佩戴安全帽',
-                '建筑材料堵塞安全通道',
-                '施工时间超出规定时段',
-                '施工区域卫生状况差',
-                '临时用电线路不规范',
-                '动火作业无监护人',
-                '高空作业无安全措施'
-            ];
+            if (decorationTypes.includes(newType)) {
+                alert('该装修类型已存在');
+                return;
+            }
             
-            const randomProject = projects[Math.floor(Math.random() * projects.length)];
-            const today = new Date();
-            const rectifyDate = new Date(today);
-            rectifyDate.setDate(rectifyDate.getDate() + Math.floor(Math.random() * 3) + 1);
+            decorationTypes.push(newType);
+            saveToLocalStorage();
             
-            document.getElementById('inspectionProjectId').value = randomProject.id;
-            document.getElementById('inspectionDate').value = today.toISOString().split('T')[0];
-            document.getElementById('inspector').value = ['张三', '李四', '王五'][Math.floor(Math.random() * 3)];
-            document.getElementById('problemType').value = problemTypes[Math.floor(Math.random() * problemTypes.length)];
-            document.getElementById('severity').value = ['低', '中', '高'][Math.floor(Math.random() * 3)];
-            document.getElementById('problemDescription').value = descriptions[Math.floor(Math.random() * descriptions.length)];
-            document.getElementById('rectifyDate').value = rectifyDate.toISOString().split('T')[0];
+            document.getElementById('newDecorationType').value = '';
+            loadDecorationTypes();
+            initDecorationTypeOptions();
+            
+            alert('装修类型添加成功！');
         }
         
-        // 更新项目选择下拉框
-        function updateProjectSelect() {
-            const select = document.getElementById('inspectionProjectId');
-            select.innerHTML = '<option value="">选择项目</option>';
+        // 移除装修类型
+        function removeDecorationType(index) {
+            if (confirm('确定要删除这个装修类型吗？')) {
+                decorationTypes.splice(index, 1);
+                saveToLocalStorage();
+                loadDecorationTypes();
+                initDecorationTypeOptions();
+            }
+        }
+        
+        // 打开自定义类型模态框
+        function openCustomTypeModal() {
+            closeModal('newProjectModal');
+            openModal('customTypeModal');
+        }
+        
+        // 保存自定义类型
+        function saveCustomType() {
+            const typeName = document.getElementById('customTypeName').value.trim();
+            if (!typeName) {
+                alert('请输入类型名称');
+                return;
+            }
             
-            projects.forEach(project => {
+            if (!decorationTypes.includes(typeName)) {
+                decorationTypes.push(typeName);
+                saveToLocalStorage();
+                
+                // 更新选择框
+                initDecorationTypeOptions();
+                
+                // 设置选中
+                const select = document.getElementById('decorationType');
+                select.value = typeName;
+                
+                alert('自定义类型添加成功！');
+            } else {
+                // 直接选中已存在的类型
+                const select = document.getElementById('decorationType');
+                select.value = typeName;
+            }
+            
+            closeModal('customTypeModal');
+            openModal('newProjectModal');
+        }
+        
+        // 初始化楼层选项
+        function initFloorOptions() {
+            const floors = [];
+            for (let i = 1; i <= 35; i++) {
+                floors.push(i + 'F');
+            }
+            
+            const selectElements = document.querySelectorAll('select[id="floor"], select[onchange*="filterByFloor"]');
+            selectElements.forEach(select => {
+                // 保存现有选项
+                const existingOptions = select.querySelectorAll('option');
+                const firstOption = existingOptions[0];
+                
+                // 清空并重新添加
+                select.innerHTML = '';
+                if (firstOption) select.appendChild(firstOption);
+                
+                floors.forEach(floor => {
+                    const option = document.createElement('option');
+                    option.value = floor;
+                    option.textContent = floor;
+                    select.appendChild(option);
+                });
+            });
+        }
+        
+        // 初始化装修类型选项
+        function initDecorationTypeOptions() {
+            const select = document.getElementById('decorationType');
+            select.innerHTML = '<option value="">请选择类型</option>';
+            
+            decorationTypes.forEach(type => {
                 const option = document.createElement('option');
-                option.value = project.id;
-                option.textContent = `${project.id} - ${project.tenant} (${project.floor}-${project.unit})`;
+                option.value = type;
+                option.textContent = type;
                 select.appendChild(option);
             });
+            
+            // 添加自定义选项
+            const customOption = document.createElement('option');
+            customOption.value = 'custom';
+            customOption.textContent = '自定义类型...';
+            select.appendChild(customOption);
+            
+            // 添加事件监听
+            select.onchange = function() {
+                if (this.value === 'custom') {
+                    openCustomTypeModal();
+                }
+            };
         }
         
-        // 更新仪表板
-        function updateDashboard() {
-            const activeProjects = projects.filter(p => p.status === '施工中' || p.status === '待验收').length;
-            const totalArea = projects.reduce((sum, p) => sum + p.area, 0);
-            const violations = inspections.length;
-            const inspectionRate = inspections.filter(i => i.rectifyStatus === '已完成').length / inspections.length * 100 || 0;
+        // 初始化危险作业复选框
+        function initDangerCheckboxes() {
+            const container = document.getElementById('dangerCheckboxes');
+            container.innerHTML = '';
             
-            document.getElementById('kpiActive').textContent = activeProjects;
-            document.getElementById('kpiArea').textContent = totalArea + '㎡';
-            document.getElementById('kpiViolation').textContent = violations + '次';
-            document.getElementById('kpiInspection').textContent = inspectionRate.toFixed(0) + '%';
-            
-            // 更新状态分布
-            updateStatusDistribution();
-            
-            // 更新预警信息
-            updateWarningList();
-        }
-        
-        // 更新状态分布
-        function updateStatusDistribution() {
-            const tbody = document.getElementById('statusDistribution');
-            tbody.innerHTML = '';
-            
-            const statusCount = {};
-            projects.forEach(project => {
-                statusCount[project.status] = (statusCount[project.status] || 0) + 1;
-            });
-            
-            const total = projects.length;
-            const statuses = ['审批中', '施工中', '待验收', '已完成', '已逾期'];
-            
-            statuses.forEach(status => {
-                const count = statusCount[status] || 0;
-                const percentage = total > 0 ? (count / total * 100).toFixed(1) : 0;
-                const area = projects.filter(p => p.status === status).reduce((sum, p) => sum + p.area, 0);
-                
-                // 计算平均工期（仅针对已完成或有实际开始日期的项目）
-                const relevantProjects = projects.filter(p => p.status === status && p.actualStart);
-                const avgDays = relevantProjects.length > 0 ? 
-                    Math.round(relevantProjects.reduce((sum, p) => {
-                        const start = new Date(p.actualStart);
-                        const end = p.status === '已完成' ? new Date(p.endDate) : new Date();
-                        return sum + Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-                    }, 0) / relevantProjects.length) : '-';
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td><span class="status-badge status-${getStatusClass(status)}">${status}</span></td>
-                    <td>${count}</td>
-                    <td>${percentage}%</td>
-                    <td>${area}㎡</td>
-                    <td>${avgDays}天</td>
-                    <td>
-                        <button class="mark-btn" onclick="filterByStatus('${status}')">查看</button>
-                        <button class="mark-btn" onclick="exportStatusProjects('${status}')">导出</button>
-                    </td>
+            DANGER_TYPES.forEach(type => {
+                const item = document.createElement('div');
+                item.className = 'checkbox-item';
+                item.innerHTML = `
+                    <input type="checkbox" id="${type.id}" value="${type.name}">
+                    <label for="${type.id}" style="color: ${type.color};">${type.name}</label>
                 `;
-                tbody.appendChild(row);
+                container.appendChild(item);
             });
         }
         
-        // 按状态筛选
-        function filterByStatus(status) {
-            document.getElementById('filterStatus').value = status;
-            filterProjects();
-            switchTab('projects');
+        // 格式化日期
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
         }
         
-        // 筛选项目
-        function filterProjects() {
-            updateProjectList();
+        // 获取状态类名
+        function getStatusClass(status) {
+            const map = {
+                '审批中': 'approval',
+                '施工中': 'construction',
+                '待验收': 'construction',
+                '已完工': 'completed',
+                '已逾期': 'delay'
+            };
+            return map[status] || 'approval';
         }
         
-        // 更新预警列表
-        function updateWarningList() {
-            const warningList = document.getElementById('warningList');
-            warningList.innerHTML = '';
-            
-            // 检查逾期项目
-            const today = new Date();
-            projects.forEach(project => {
-                const endDate = new Date(project.endDate);
-                if (endDate < today && project.status !== '已完成') {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div style="background: #fff1f0; padding: 8px; margin: 5px 0; border-radius: 4px;">
-                            🔴 <strong>${project.id} - ${project.tenant}</strong> (${project.floor}-${project.unit})<br>
-                            项目已逾期 ${Math.ceil((today - endDate) / (1000 * 60 * 60 * 24))} 天！
-                        </div>
-                    `;
-                    warningList.appendChild(div);
-                }
-            });
-            
-            // 检查超期未整改的巡检
-            inspections.forEach(inspection => {
-                const rectifyDate = new Date(inspection.rectifyDate);
-                if (rectifyDate < today && inspection.rectifyStatus !== '已完成') {
-                    const div = document.createElement('div');
-                    div.innerHTML = `
-                        <div style="background: #fff7e6; padding: 8px; margin: 5px 0; border-radius: 4px;">
-                            🟡 <strong>${inspection.projectId} - ${inspection.problemType}</strong><br>
-                            整改已逾期，请立即处理！
-                        </div>
-                    `;
-                    warningList.appendChild(div);
-                }
-            });
+        // 保存到本地存储
+        function saveToLocalStorage() {
+            localStorage.setItem('decorationProjects', JSON.stringify(projects));
+            localStorage.setItem('inspectionRecords', JSON.stringify(inspectionRecords));
+            localStorage.setItem('decorationTypes', JSON.stringify(decorationTypes));
+            localStorage.setItem('dangerOperations', JSON.stringify(dangerOperations));
         }
         
-        // 更新数据分析
-        function updateAnalysis() {
-            // 更新月度统计
-            updateMonthlyStats();
-            
-            // 更新施工方排名
-            updateContractorRanking();
-            
-            // 更新图表
-            updateCharts();
-        }
-        
-        // 更新月度统计
-        function updateMonthlyStats() {
-            const tbody = document.getElementById('monthlyStats');
-            tbody.innerHTML = '';
-            
-            const months = ['2023-11', '2023-12', '2024-01'];
-            months.forEach(month => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${month}</td>
-                    <td>${Math.floor(Math.random() * 5) + 2}</td>
-                    <td>${Math.floor(Math.random() * 4) + 1}</td>
-                    <td>${Math.floor(Math.random() * 8) + 4}</td>
-                    <td>${Math.floor(Math.random() * 30) + 20}</td>
-                    <td>${Math.floor(Math.random() * 15) + 80}%</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-        
-        // 更新施工方排名
-        function updateContractorRanking() {
-            const tbody = document.getElementById('contractorRanking');
-            tbody.innerHTML = '';
-            
-            const contractorStats = {};
-            projects.forEach(project => {
-                if (!contractorStats[project.contractor]) {
-                    contractorStats[project.contractor] = {
-                        projects: 0,
-                        totalArea: 0,
-                        violations: 0
-                    };
-                }
-                contractorStats[project.contractor].projects++;
-                contractorStats[project.contractor].totalArea += project.area;
-            });
-            
-            inspections.forEach(inspection => {
-                const project = projects.find(p => p.id === inspection.projectId);
-                if (project && contractorStats[project.contractor]) {
-                    contractorStats[project.contractor].violations++;
-                }
-            });
-            
-            const rankings = Object.keys(contractorStats).map(contractor => {
-                const stats = contractorStats[contractor];
-                const score = 100 - (stats.violations * 5) + (stats.projects * 10);
-                return {
-                    contractor,
-                    ...stats,
-                    score: Math.max(60, Math.min(100, score))
-                };
-            }).sort((a, b) => b.score - a.score);
-            
-            rankings.forEach((rank, index) => {
-                const row = document.createElement('tr');
-                const grade = rank.score >= 90 ? 'A+' : rank.score >= 80 ? 'A' : rank.score >= 70 ? 'B' : 'C';
-                const gradeColor = rank.score >= 90 ? '#52c41a' : rank.score >= 80 ? '#1890ff' : rank.score >= 70 ? '#fa8c16' : '#ff4d4f';
-                
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${rank.contractor}</td>
-                    <td>${rank.projects}</td>
-                    <td>${Math.floor(Math.random() * 10) + 25}天</td>
-                    <td>${Math.floor(Math.random() * 20) + 5}%</td>
-                    <td style="color: ${gradeColor}; font-weight: bold;">${grade} (${rank.score}分)</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-        
-        // 更新图表
-        function updateCharts() {
-            // 问题类型分布图
-            const problemTypes = {};
-            inspections.forEach(inspection => {
-                problemTypes[inspection.problemType] = (problemTypes[inspection.problemType] || 0) + 1;
-            });
-            
-            const problemTypeCtx = document.getElementById('problemTypeChart').getContext('2d');
-            new Chart(problemTypeCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(problemTypes),
-                    datasets: [{
-                        data: Object.values(problemTypes),
-                        backgroundColor: ['#ff4d4f', '#fa8c16', '#1890ff', '#52c41a', '#722ed1', '#13c2c2']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-        }
-        
-        // 显示模态框
-        function showModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
+        // 打开模态框
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
         }
         
         // 关闭模态框
@@ -1480,125 +1507,128 @@
             document.getElementById(modalId).style.display = 'none';
         }
         
-        // 导出到Excel
-        function exportToExcel() {
-            // 创建工作簿
-            const wb = XLSX.utils.book_new();
-            
-            // 项目数据表
-            const projectData = [
-                ['项目ID', '租户名称', '楼层', '单元号', '装修类型', '面积(㎡)', '合同金额', '合同开始', '合同结束', '实际开始', '状态', '施工方', '负责人', '联系电话', '进度%', '备注'],
-                ...projects.map(p => [
-                    p.id, p.tenant, p.floor, p.unit, p.type, p.area, p.amount, 
-                    p.startDate, p.endDate, p.actualStart, p.status, p.contractor, 
-                    p.manager, p.phone, p.progress + '%', p.remarks
-                ])
-            ];
-            
-            const wsProjects = XLSX.utils.aoa_to_sheet(projectData);
-            XLSX.utils.book_append_sheet(wb, wsProjects, "项目数据");
-            
-            // 巡检数据表
-            const inspectionData = [
-                ['巡检ID', '项目ID', '巡检日期', '巡检人', '问题类型', '问题描述', '严重程度', '整改期限', '整改状态', '复查人', '复查日期'],
-                ...inspections.map(i => [
-                    i.id, i.projectId, i.date, i.inspector, i.problemType, i.description, 
-                    i.severity, i.rectifyDate, i.rectifyStatus, i.reviewPerson, i.reviewDate
-                ])
-            ];
-            
-            const wsInspections = XLSX.utils.aoa_to_sheet(inspectionData);
-            XLSX.utils.book_append_sheet(wb, wsInspections, "巡检记录");
-            
-            // 导出文件
-            const fileName = `写字楼装修看板_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
-            
-            alert(`Excel文件已导出：${fileName}`);
+        // 搜索项目
+        function searchProjects(query) {
+            // 简化的搜索功能
+            console.log('搜索:', query);
         }
         
-        // 导出项目表
-        function exportProjects() {
-            const wb = XLSX.utils.book_new();
-            
-            const projectData = [
-                ['项目ID', '租户名称', '楼层', '单元号', '装修类型', '面积(㎡)', '合同金额', '合同工期', '当前状态', '施工方', '负责人', '联系电话', '进度', '备注'],
-                ...projects.map(p => [
-                    p.id, p.tenant, p.floor, p.unit, p.type, p.area, p.amount, 
-                    `${p.startDate}至${p.endDate}`, p.status, p.contractor, 
-                    p.manager, p.phone, p.progress + '%', p.remarks
-                ])
-            ];
-            
-            const ws = XLSX.utils.aoa_to_sheet(projectData);
-            XLSX.utils.book_append_sheet(wb, ws, "项目列表");
-            
-            const fileName = `装修项目列表_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+        // 筛选项目
+        function filterByStatus(status) {
+            console.log('按状态筛选:', status);
         }
         
-        // 导出状态项目
-        function exportStatusProjects(status) {
-            const filteredProjects = projects.filter(p => p.status === status);
-            
-            if (filteredProjects.length === 0) {
-                alert(`没有${status}的项目！`);
-                return;
-            }
-            
-            const wb = XLSX.utils.book_new();
-            
-            const projectData = [
-                ['项目ID', '租户名称', '楼层', '单元号', '装修类型', '面积(㎡)', '合同金额', '合同开始', '合同结束', '施工方', '负责人', '联系电话', '进度', '备注'],
-                ...filteredProjects.map(p => [
-                    p.id, p.tenant, p.floor, p.unit, p.type, p.area, p.amount, 
-                    p.startDate, p.endDate, p.contractor, p.manager, p.phone, p.progress + '%', p.remarks
-                ])
-            ];
-            
-            const ws = XLSX.utils.aoa_to_sheet(projectData);
-            XLSX.utils.book_append_sheet(wb, ws, `${status}项目`);
-            
-            const fileName = `${status}项目列表_${new Date().toISOString().slice(0,10).replace(/-/g, '')}.xlsx`;
-            XLSX.writeFile(wb, fileName);
+        // 筛选楼层
+        function filterByFloor(floor) {
+            console.log('按楼层筛选:', floor);
         }
         
-        // 显示统计数据
-        function showStatistics() {
-            const totalProjects = projects.length;
-            const totalArea = projects.reduce((sum, p) => sum + p.area, 0);
-            const totalInvestment = projects.reduce((sum, p) => sum + p.amount, 0);
-            const violationRate = inspections.length / totalProjects || 0;
-            
-            alert(`📊 统计数据：
-• 总项目数：${totalProjects}个
-• 总装修面积：${totalArea}㎡
-• 总投资额：${totalInvestment.toLocaleString()}元
-• 平均违规率：${(violationRate * 100).toFixed(1)}%
-• 整改完成率：${(inspections.filter(i => i.rectifyStatus === '已完成').length / inspections.length * 100 || 0).toFixed(1)}%`);
+        // 搜索项目表格
+        function searchProjectsTable(query) {
+            console.log('表格搜索:', query);
         }
         
-        // 清空所有数据
-        function clearAllData() {
-            if (confirm('确定要清空所有数据吗？此操作不可恢复！')) {
-                projects = [];
-                inspections = [];
-                selectedProjects.clear();
-                updateAllViews();
-                alert('所有数据已清空！');
+        // 打开新增巡检记录模态框
+        function openNewInspectionModal() {
+            // 这里可以添加打开巡检记录表单的逻辑
+            alert('在实际应用中，这里会打开巡检记录表单');
+        }
+        
+        // 更新统计
+        function updateStatistics() {
+            const container = document.getElementById('statisticsContent');
+            
+            // 生成统计HTML
+            const html = `
+                <div class="stats-cards">
+                    <div class="stat-card">
+                        <div class="stat-label">项目总数</div>
+                        <div class="stat-value">${projects.length}</div>
+                    </div>
+                    <div class="stat-card warning">
+                        <div class="stat-label">审批中项目</div>
+                        <div class="stat-value">${projects.filter(p => p.status === '审批中').length}</div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-label">施工中项目</div>
+                        <div class="stat-value">${projects.filter(p => p.status === '施工中').length}</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">平均工期(天)</div>
+                        <div class="stat-value">30</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 30px;">装修类型分布</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>装修类型</th>
+                            <th>项目数量</th>
+                            <th>占比</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${getDecorationTypeStats()}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // 获取装修类型统计
+        function getDecorationTypeStats() {
+            const stats = {};
+            projects.forEach(project => {
+                stats[project.decorationType] = (stats[project.decorationType] || 0) + 1;
+            });
+            
+            let html = '';
+            Object.entries(stats).forEach(([type, count]) => {
+                const percentage = ((count / projects.length) * 100).toFixed(1);
+                html += `
+                    <tr>
+                        <td>${type}</td>
+                        <td>${count}</td>
+                        <td>${percentage}%</td>
+                    </tr>
+                `;
+            });
+            
+            return html;
+        }
+        
+        // 处理预警
+        function handleWarning(warningId) {
+            const warning = inspectionRecords.find(r => r.id === warningId);
+            if (warning) {
+                warning.status = '处理中';
+                saveToLocalStorage();
+                loadDashboardData();
+                loadInspectionRecords();
+                alert('预警已标记为处理中');
             }
         }
         
-        // 页面加载初始化
-        window.onload = function() {
-            initSampleData();
-            document.getElementById('inspectionDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('rectifyDate').value = new Date(new Date().setDate(new Date().getDate() + 2)).toISOString().split('T')[0];
-        };
+        // 编辑巡检记录
+        function editInspection(recordId) {
+            // 这里可以添加编辑巡检记录的逻辑
+            alert('编辑巡检记录功能');
+        }
         
-        // 监听日期变化计算工期
-        document.getElementById('startDate').addEventListener('change', calculateEstimatedDays);
-        document.getElementById('endDate').addEventListener('change', calculateEstimatedDays);
+        // 删除巡检记录
+        function deleteInspection(recordId) {
+            if (confirm('确定要删除这条巡检记录吗？')) {
+                inspectionRecords = inspectionRecords.filter(r => r.id !== recordId);
+                saveToLocalStorage();
+                loadInspectionRecords();
+                loadDashboardData();
+            }
+        }
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
