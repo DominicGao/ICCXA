@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>写字楼二次装修管理看板 - 在线操作版</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1890ff;
+            --success-color: #52c41a;
+            --warning-color: #faad14;
+            --error-color: #ff4d4f;
+            --info-color: #13c2c2;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --border-color: #e8e8e8;
+            --text-primary: #262626;
+            --text-secondary: #595959;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* 头部样式 */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), #096dd9);
+            color: white;
+            padding: 0 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 64px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo i {
+            font-size: 28px;
+        }
+
+        .logo h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 内容区域 */
+        .app-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* 侧边栏 */
+        .app-sidebar {
+            width: 240px;
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 24px 0;
+            overflow-y: auto;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            padding: 12px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background-color: rgba(24, 144, 255, 0.1);
+            color: var(--primary-color);
+        }
+
+        .nav-item.active {
+            background-color: rgba(24, 144, 255, 0.1);
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--error-color);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+
+        /* 主内容区 */
+        .app-main {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        /* 卡片样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* KPI卡片 */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .kpi-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .kpi-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 8px 0;
+            color: var(--primary-color);
+        }
+
+        .kpi-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .kpi-trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .trend-up { color: var(--success-color); }
+        .trend-down { color: var(--error-color); }
+
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background-color: #fafafa;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tr:hover {
+            background-color: #f6f8fa;
+        }
+
+        /* 状态标记 */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            text-align: center;
+            min-width: 80px;
+        }
+
+        .status-new { background: #f6ffed; color: var(--success-color); border: 1px solid #b7eb8f; }
+        .status-processing { background: #e6f7ff; color: var(--primary-color); border: 1px solid #91d5ff; }
+        .status-delay { background: #fff1f0; color: var(--error-color); border: 1px solid #ffa39e; }
+        .status-completed { background: #f6ffed; color: var(--success-color); border: 1px solid #b7eb8f; }
+        .status-warning { background: #fff7e6; color: var(--warning-color); border: 1px solid #ffd591; }
+
+        /* 操作按钮 */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #096dd9;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* 表单样式 */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            min-width: 500px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: calc(90vh - 120px);
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* 预警面板 */
+        .alert-panel {
+            border-left: 4px solid;
+            padding: 16px;
+            margin: 16px 0;
+            border-radius: 4px;
+        }
+
+        .alert-high {
+            background: #fff1f0;
+            border-left-color: var(--error-color);
+        }
+
+        .alert-medium {
+            background: #fff7e6;
+            border-left-color: var(--warning-color);
+        }
+
+        .alert-low {
+            background: #f6ffed;
+            border-left-color: var(--success-color);
+        }
+
+        /* 楼层热力图 */
+        .floor-map {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 16px;
+        }
+
+        .floor-cell {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .floor-cell:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell-construction { background: #e6f7ff; color: var(--primary-color); }
+        .cell-approval { background: #fff7e6; color: var(--warning-color); }
+        .cell-waiting { background: #f6ffed; color: var(--success-color); }
+
+        /* 进度条 */
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 8px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        /* 通知系统 */
+        .notification-container {
+            position: fixed;
+            top: 80px;
+            right: 24px;
+            z-index: 3000;
+        }
+
+        .notification {
+            background: white;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            animation: slideInRight 0.3s;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .notification.warning {
+            border-left: 4px solid var(--warning-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 992px) {
+            .app-sidebar {
+                display: none;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                min-width: 90vw;
+            }
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 48px 24px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            color: #d9d9d9;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 头部 -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-building"></i>
+                    <h1>写字楼二次装修管理看板</h1>
+                </div>
+                <div class="user-info">
+                    <div class="online-status">
+                        <i class="fas fa-circle" style="color: #52c41a; font-size: 12px;"></i>
+                        <span style="margin-left: 4px;">在线</span>
+                    </div>
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 内容区域 -->
+        <div class="app-content">
+            <!-- 侧边栏 -->
+            <nav class="app-sidebar">
+                <ul class="nav-menu">
+                    <li class="nav-item active" data-tab="dashboard">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>总览看板</span>
+                    </li>
+                    <li class="nav-item" data-tab="projects">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>项目管理</span>
+                        <span class="nav-badge" id="projectBadge">0</span>
+                    </li>
+                    <li class="nav-item" data-tab="inspection">
+                        <i class="fas fa-clipboard-check"></i>
+                        <span>巡检记录</span>
+                        <span class="nav-badge" id="inspectionBadge">0</span>
+                    </li>
+                    <li class="nav-item" data-tab="warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>风险预警</span>
+                        <span class="nav-badge" id="warningBadge">0</span>
+                    </li>
+                    <li class="nav-item" data-tab="analysis">
+                        <i class="fas fa-chart-line"></i>
+                        <span>数据分析</span>
+                    </li>
+                    <li class="nav-item" data-tab="floor-map">
+                        <i class="fas fa-layer-group"></i>
+                        <span>楼层热力图</span>
+                    </li>
+                    <li class="nav-item" data-tab="settings">
+                        <i class="fas fa-cog"></i>
+                        <span>系统设置</span>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- 主内容区 -->
+            <main class="app-main" id="mainContent">
+                <!-- 总览看板 -->
+                <div class="tab-content active" id="dashboard">
+                    <!-- KPI卡片 -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card" onclick="showProjectsByStatus('施工中')">
+                            <i class="fas fa-hard-hat" style="color: var(--primary-color); font-size: 24px;"></i>
+                            <div class="kpi-value" id="kpiActiveProjects">0</div>
+                            <div class="kpi-label">活跃项目</div>
+                            <div class="kpi-trend trend-up">较上月 +2</div>
+                        </div>
+                        <div class="kpi-card" onclick="showTab('warning')">
+                            <i class="fas fa-exclamation-circle" style="color: var(--error-color); font-size: 24px;"></i>
+                            <div class="kpi-value" id="kpiViolations">0</div>
+                            <div class="kpi-label">本月违规</div>
+                            <div class="kpi-trend trend-down">减少 3次</div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="fas fa-ruler-combined" style="color: var(--success-color); font-size: 24px;"></i>
+                            <div class="kpi-value" id="kpiTotalArea">0㎡</div>
+                            <div class="kpi-label">总装修面积</div>
+                            <div class="kpi-trend trend-up">环比 15%</div>
+                        </div>
+                        <div class="kpi-card">
+                            <i class="fas fa-check-circle" style="color: var(--info-color); font-size: 24px;"></i>
+                            <div class="kpi-value" id="kpiInspectionRate">0%</div>
+                            <div class="kpi-label">整改完成率</div>
+                            <div class="kpi-trend trend-up">提高 5%</div>
+                        </div>
+                    </div>
+
+                    <!-- 快速操作 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-bolt"></i>
+                                <span>快速操作</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="openAddProjectModal()">
+                                    <i class="fas fa-plus"></i>新增项目
+                                </button>
+                                <button class="btn btn-success" onclick="openAddInspectionModal()">
+                                    <i class="fas fa-clipboard-check"></i>新增巡检
+                                </button>
+                                <button class="btn btn-warning" onclick="generateTestData()">
+                                    <i class="fas fa-magic"></i>生成测试数据
+                                </button>
+                                <button class="btn btn-primary" onclick="exportToExcel()">
+                                    <i class="fas fa-file-export"></i>导出数据
+                                </button>
+                                <button class="btn btn-danger" onclick="showClearDataModal()">
+                                    <i class="fas fa-trash"></i>清空数据
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 最新预警 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>最新预警</span>
+                            </div>
+                            <button class="btn btn-sm btn-primary" onclick="showTab('warning')">查看全部</button>
+                        </div>
+                        <div class="card-body" id="recentWarnings">
+                            <!-- 动态生成 -->
+                        </div>
+                    </div>
+
+                    <!-- 项目进度 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-chart-bar"></i>
+                                <span>项目进度</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="progressChart"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 项目管理 -->
+                <div class="tab-content" id="projects">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-project-diagram"></i>
+                                <span>项目管理</span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary" onclick="openAddProjectModal()">
+                                    <i class="fas fa-plus"></i>新增
+                                </button>
+                                <button class="btn btn-warning" onclick="showBatchOperationModal()">
+                                    <i class="fas fa-edit"></i>批量操作
+                                </button>
+                                <button class="btn btn-success" onclick="exportProjects()">
+                                    <i class="fas fa-download"></i>导出
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <!-- 筛选条件 -->
+                            <div class="form-row" style="margin-bottom: 16px;">
+                                <div class="form-group">
+                                    <input type="text" class="form-control" placeholder="搜索项目名称或ID..." 
+                                           id="projectSearch" oninput="filterProjects()">
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" id="projectStatusFilter" onchange="filterProjects()">
+                                        <option value="">全部状态</option>
+                                        <option value="审批中">审批中</option>
+                                        <option value="施工中">施工中</option>
+                                        <option value="待验收">待验收</option>
+                                        <option value="已完成">已完成</option>
+                                        <option value="已逾期">已逾期</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select class="form-control" id="projectFloorFilter" onchange="filterProjects()">
+                                        <option value="">全部楼层</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- 项目表格 -->
+                            <div style="overflow-x: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 40px;">
+                                                <input type="checkbox" id="selectAllProjects" onchange="toggleSelectAllProjects()">
+                                            </th>
+                                            <th>项目ID</th>
+                                            <th>租户名称</th>
+                                            <th>位置</th>
+                                            <th>装修类型</th>
+                                            <th>面积(㎡)</th>
+                                            <th>合同工期</th>
+                                            <th>状态</th>
+                                            <th>进度</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="projectsTable">
+                                        <!-- 动态生成 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 巡检记录 -->
+                <div class="tab-content" id="inspection">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-clipboard-check"></i>
+                                <span>巡检记录</span>
+                            </div>
+                            <button class="btn btn-primary" onclick="openAddInspectionModal()">
+                                <i class="fas fa-plus"></i>新增巡检
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <!-- 巡检表格 -->
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>日期</th>
+                                        <th>项目</th>
+                                        <th>巡检人</th>
+                                        <th>问题类型</th>
+                                        <th>严重程度</th>
+                                        <th>整改期限</th>
+                                        <th>整改状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inspectionsTable">
+                                    <!-- 动态生成 -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 风险预警 -->
+                <div class="tab-content" id="warning">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>风险预警中心</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="warningCenter">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 楼层热力图 -->
+                <div class="tab-content" id="floor-map">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">
+                                <i class="fas fa-layer-group"></i>
+                                <span>楼层装修热力图</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="floor-map" id="floorMap">
+                                <!-- 动态生成 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 通知容器 -->
+        <div class="notification-container" id="notificationContainer"></div>
+
+        <!-- 新增项目模态框 -->
+        <div class="modal" id="addProjectModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fas fa-plus"></i>
+                        新增装修项目
+                    </div>
+                    <button class="btn btn-sm" onclick="closeModal('addProjectModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="projectForm" onsubmit="saveProject(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">租户名称 *</label>
+                                <input type="text" class="form-control" required id="tenantName">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">装修类型 *</label>
+                                <select class="form-control" required id="projectType">
+                                    <option value="办公室装修">办公室装修</option>
+                                    <option value="展厅改造">展厅改造</option>
+                                    <option value="会议室改造">会议室改造</option>
+                                    <option value="扩租装修">扩租装修</option>
+                                    <option value="办公室翻新">办公室翻新</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">楼层 *</label>
+                                <select class="form-control" required id="floor">
+                                    <!-- 动态生成 -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">单元号 *</label>
+                                <input type="text" class="form-control" required id="unit">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">装修面积(㎡) *</label>
+                                <input type="number" class="form-control" required id="area" min="50" max="1000">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">合同金额(元) *</label>
+                                <input type="number" class="form-control" required id="amount" min="50000">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">合同开始日期 *</label>
+                                <input type="date" class="form-control" required id="startDate">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">合同结束日期 *</label>
+                                <input type="date" class="form-control" required id="endDate">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">施工方 *</label>
+                                <input type="text" class="form-control" required id="contractor">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">负责人 *</label>
+                                <input type="text" class="form-control" required id="manager">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">联系电话</label>
+                            <input type="tel" class="form-control" id="phone">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">备注</label>
+                            <textarea class="form-control" rows="2" id="remarks"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal('addProjectModal')">取消</button>
+                    <button class="btn btn-primary" type="submit" form="projectForm">
+                        <i class="fas fa-save"></i>保存项目
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 新增巡检模态框 -->
+        <div class="modal" id="addInspectionModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fas fa-clipboard-check"></i>
+                        新增巡检记录
+                    </div>
+                    <button class="btn btn-sm" onclick="closeModal('addInspectionModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="inspectionForm" onsubmit="saveInspection(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">项目选择 *</label>
+                                <select class="form-control" required id="inspectionProject">
+                                    <option value="">请选择项目</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">巡检日期 *</label>
+                                <input type="date" class="form-control" required id="inspectionDate">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">巡检人 *</label>
+                                <input type="text" class="form-control" required id="inspector">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">问题类型 *</label>
+                                <select class="form-control" required id="problemType">
+                                    <option value="消防违规">消防违规</option>
+                                    <option value="安全违规">安全违规</option>
+                                    <option value="物料堆放">物料堆放</option>
+                                    <option value="噪音扰民">噪音扰民</option>
+                                    <option value="环境卫生">环境卫生</option>
+                                    <option value="其他">其他</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">严重程度 *</label>
+                                <select class="form-control" required id="severity">
+                                    <option value="低">低</option>
+                                    <option value="中">中</option>
+                                    <option value="高">高</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">整改期限 *</label>
+                                <input type="date" class="form-control" required id="rectifyDate">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">问题描述 *</label>
+                            <textarea class="form-control" rows="3" required id="problemDescription"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal('addInspectionModal')">取消</button>
+                    <button class="btn btn-primary" type="submit" form="inspectionForm">
+                        <i class="fas fa-save"></i>保存记录
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 批量操作模态框 -->
+        <div class="modal" id="batchOperationModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fas fa-edit"></i>
+                        批量操作
+                    </div>
+                    <button class="btn btn-sm" onclick="closeModal('batchOperationModal')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label">操作类型</label>
+                        <select class="form-control" id="batchAction" onchange="updateBatchContent()">
+                            <option value="updateStatus">更新状态</option>
+                            <option value="markDelay">标记逾期</option>
+                            <option value="markComplete">标记完成</option>
+                        </select>
+                    </div>
+                    <div id="batchContent">
+                        <!-- 动态内容 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn" onclick="closeModal('batchOperationModal')">取消</button>
+                    <button class="btn btn-primary" onclick="executeBatchAction()">
+                        <i class="fas fa-check"></i>执行操作
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 清空数据确认模态框 -->
+        <div class="modal" id="clearDataModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--error-color);"></i>
